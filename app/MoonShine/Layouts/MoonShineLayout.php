@@ -32,6 +32,7 @@ use MoonShine\UI\Components\{Breadcrumbs,
     When};
 use App\MoonShine\Resources\QuotesResource;
 use MoonShine\MenuManager\MenuItem;
+use App\MoonShine\Resources\VisitResource;
 
 final class MoonShineLayout extends AppLayout
 {
@@ -47,6 +48,7 @@ final class MoonShineLayout extends AppLayout
         return [
             ...parent::menu(),
             MenuItem::make('Quotes', QuotesResource::class),
+            MenuItem::make('Visits', VisitResource::class),
         ];
     }
 
