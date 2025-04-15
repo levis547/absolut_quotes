@@ -46,7 +46,7 @@ class IndexController extends Controller
     {
         // Используем API для получения местоположения по IP
         $client = new Client();
-        $apiKey = 'YOUR_API_KEY';  // Замените на ваш API-ключ
+        $apiKey = 'qa138aeews6spzgr';  // Замените на ваш API-ключ
         $url = "https://2ip.ru/api/geo/?ip={$ipAddress}&token={$apiKey}";
 
         try {
