@@ -29,7 +29,7 @@ class IndexController extends Controller
         $agent = new Agent();
         $browser = $agent->browser();
 
-        // Получаем местоположение по IP через API 2ip.ru
+        // Получаем местоположение по IP через API 2ip.io
         $address = $this->getLocationByIp($ipAddress);
 
         // Сохраняем данные в базе данных
@@ -47,7 +47,7 @@ class IndexController extends Controller
         // Используем API для получения местоположения по IP
         $client = new Client();
         $apiKey = 'qa138aeews6spzgr';  // Замените на ваш API-ключ
-        $url = "https://2ip.ru/api/geo/?ip={$ipAddress}&token={$apiKey}";
+        $url = "https://api.2ip.io/{$ipAddress}?token={$apiKey}"; // Формируем URL с IP и токеном
 
         try {
             $response = $client->get($url);
@@ -55,9 +55,11 @@ class IndexController extends Controller
 
             // Проверяем, есть ли данные о местоположении
             if (isset($data['city']) && isset($data['country'])) {
+                // Возвращаем город и страну
                 return $data['city'] . ', ' . $data['country'];
             } else {
-                return 'Unknown location';
+                // Если местоположение не найдено, выводим информацию о том, что не удалось найти
+                return 'Location not found';
             }
         } catch (\Exception $e) {
             // В случае ошибки возвращаем 'Unknown location'
