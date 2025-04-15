@@ -25,21 +25,25 @@ class IndexController extends Controller
         // Получаем IP-адрес
         $ipAddress = $request->ip();
 
-        // Получаем данные о браузере
-        $agent = new Agent();
-        $browser = $agent->browser();
+        // Проверяем, есть ли уже этот IP в базе данных
+        $existingVisit = User_visit::where('ip_address', $ipAddress)->first();
 
-        // Получаем местоположение по IP через API 2ip.io
-        $address = $this->getLocationByIp($ipAddress);
+        if ($existingVisit) {
+            // Если IP уже есть в базе данных, просто используем сохранённый адрес
+            $address = $existingVisit->address;
+        } else {
+            // Если IP ещё нет в базе, получаем местоположение через API
+            $address = $this->getLocationByIp($ipAddress);
 
-        // Сохраняем данные в базе данных
-        User_visit::create([
-            'ip_address' => $ipAddress,  // Сохраняем IP-адрес
-            'browser' => $browser,       // Сохраняем информацию о браузере
-            'address' => $address,       // Сохраняем адрес по IP
-        ]);
+            // Сохраняем данные в базе данных
+            User_visit::create([
+                'ip_address' => $ipAddress,  // Сохраняем IP-адрес
+                'browser' => (new Agent())->browser(),  // Сохраняем информацию о браузере
+                'address' => $address,       // Сохраняем адрес по IP
+            ]);
+        }
 
-        return response()->json(['message' => 'Visit tracked']);
+        return response()->json(['message' => 'Visit tracked', 'address' => $address]);
     }
 
     private function getLocationByIp($ipAddress)
