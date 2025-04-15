@@ -9,5 +9,6 @@ class User_visit extends Model
     protected $fillable = [
         'ip_address',
         'browser',
+        'address',
     ];
 }

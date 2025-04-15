@@ -48,48 +48,90 @@
                 line-height: 1.4;
             }
         }
+        .cursor {
+            display: inline-block;
+            margin-left: 2px;
+            width: 1px;
+            background-color: black;
+        }
+
+        .blink {
+            animation: blink 1s step-start infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
-<div id="quote-container"></div>
+<div id="quote-container">
+    <span id="quote-text"></span><span class="cursor">|</span>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 <script>
-    var quotes = @json($quotes); // Передаем цитаты в JavaScript
+    const quotes = @json($quotes->toArray());
+    const container = document.getElementById('quote-container');
+    const textElement = document.getElementById('quote-text');
+    const cursor = document.querySelector('.cursor');
 
-    // Функция для перемешивания массива цитат
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]]; // Меняем местами элементы
+    const activeQuotes = quotes.filter(q => q.status === 1);
+
+    function stripTags(html) {
+        const tmp = document.createElement("div");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    }
+
+    function getRandomQuote() {
+        const index = Math.floor(Math.random() * activeQuotes.length);
+        return stripTags(activeQuotes[index].text);
+    }
+
+    function startBlink() {
+        cursor.classList.add('blink');
+    }
+
+    function stopBlink() {
+        cursor.classList.remove('blink');
+    }
+
+    async function typeWriterEffect(text, speed = 3000) {
+        stopBlink();
+        textElement.innerHTML = '';
+        for (let i = 0; i < text.length; i++) {
+            textElement.innerHTML += text[i];
+            await new Promise(resolve => setTimeout(resolve, speed));
         }
     }
 
-    // Перемешиваем цитаты
-    shuffle(quotes);
-
-    var index = 0;
-
-    function nextQuote() {
-        // Создаем новый экземпляр Typed для каждой цитаты
-        var typed = new Typed("#quote-container", {
-            strings: [quotes[index].text], // Используем текст цитаты
-            typeSpeed: 100,
-            backSpeed: 50,
-            backDelay: 3000,
-            startDelay: 500,
-            showCursor: false,
-            onComplete: function() {
-                setTimeout(() => {
-                    index = (index + 1) % quotes.length;  // Переход к следующей цитате
-                    typed.destroy();  // Удаляем текущий экземпляр Typed
-                    nextQuote();  // Запускаем процесс для следующей цитаты
-                }, 1000);  // Задержка перед выводом следующей цитаты
-            }
-        });
+    async function deleteTextEffect(speed = 2000) {
+        stopBlink();
+        while (textElement.innerHTML.length > 0) {
+            textElement.innerHTML = textElement.innerHTML.slice(0, -1);
+            await new Promise(resolve => setTimeout(resolve, speed));
+        }
     }
 
-    nextQuote();  // Запуск функции при загрузке страницы
+    async function runQuoteLoop() {
+        while (true) {
+            const quote = getRandomQuote();
+            await typeWriterEffect(quote, 100);
+            startBlink();
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            await deleteTextEffect(80);
+            startBlink();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+
+    if (activeQuotes.length > 0) {
+        runQuoteLoop();
+    } else {
+        textElement.innerText = 'Нет доступных цитат.';
+    }
 </script>
 </body>
 </html>
