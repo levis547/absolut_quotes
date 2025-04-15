@@ -29,7 +29,10 @@ class IndexController extends Controller
         $existingVisit = User_visit::where('ip_address', $ipAddress)->first();
 
         if ($existingVisit) {
-            // Если IP уже есть в базе данных, просто используем сохранённый адрес
+            // Если IP уже есть в базе данных, обновляем только поле updated_at
+            $existingVisit->touch(); // Это обновляет поле updated_at
+
+            // Возвращаем сохранённый адрес
             $address = $existingVisit->address;
         } else {
             // Если IP ещё нет в базе, получаем местоположение через API
