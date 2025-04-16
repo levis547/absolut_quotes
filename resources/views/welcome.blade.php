@@ -97,27 +97,34 @@
         return stripTags(quote.text);
     }
 
+    // Функция задержки
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     // Функция для эффекта печати текста
     async function typeWriterEffect(text, speed = 3000) {
         stopBlink();
         textElement.innerHTML = '';
-        console.log('Начало печати текста'); // Логируем начало печати
+        console.log('Начало печати текста');
         for (let i = 0; i < text.length; i++) {
             textElement.innerHTML += text[i];
             await new Promise(resolve => setTimeout(resolve, speed));
         }
-        console.log('Печать завершена'); // Логируем окончание печати
+        console.log('Печать завершена');
+        await delay(1000); // Задержка перед следующей операцией
     }
 
     // Функция для эффекта удаления текста
     async function deleteTextEffect(speed = 2000) {
         stopBlink();
-        console.log('Начало удаления текста'); // Логируем начало удаления
+        console.log('Начало удаления текста');
         while (textElement.innerHTML.length > 0) {
             textElement.innerHTML = textElement.innerHTML.slice(0, -1);
             await new Promise(resolve => setTimeout(resolve, speed));
         }
-        console.log('Удаление завершено'); // Логируем окончание удаления
+        console.log('Удаление завершено');
+        await delay(1000); // Задержка перед следующей операцией
     }
 
     // Функция для включения мигания курсора
@@ -142,18 +149,21 @@
             // Печатаем цитату
             await typeWriterEffect(quote, 100);
 
+            // Задержка перед миганием курсора
+            await delay(1000);
+
             // Задержка для мигания курсора перед удалением
             await new Promise(resolve => setTimeout(resolve, 500));
             startBlink();
 
-            // Делаем паузу перед удалением
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            // Задержка перед удалением
+            await delay(1000);
 
             // Удаляем цитату
             await deleteTextEffect(80);
 
             // Задержка перед повторным началом цикла
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await delay(1000);
             startBlink();
         }
 
@@ -162,7 +172,7 @@
         console.log('Перемешиваем цитаты для нового круга', remainingQuotes);
 
         // Задержка перед запуском нового круга
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await delay(1000);
         runQuoteLoop();  // Запускаем цикл заново с перемешанными цитатами
     }
 
@@ -171,7 +181,7 @@
         runQuoteLoop();
     } else {
         textElement.innerText = 'Нет доступных цитат.';
-        console.log('Не найдено активных цитат'); // Логируем отсутствие активных цитат
+        console.log('Не найдено активных цитат');
     }
 
     // Обработчик ошибок
@@ -179,7 +189,6 @@
         console.error(`Произошла ошибка: ${msg} в ${url}:${lineNo}:${columnNo}`);
         return false; // Блокирует стандартное поведение ошибки
     };
-
 
 </script>
 </body>
