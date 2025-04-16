@@ -89,10 +89,10 @@
         return tmp.textContent || tmp.innerText || "";
     }
 
-    // Функция для получения случайной цитаты
-    function getRandomQuote() {
-        const index = Math.floor(Math.random() * activeQuotes.length);
-        const quote = activeQuotes[index];
+    // Функция для случайного выбора цитаты и удаления ее из массива
+    function getRandomQuote(remainingQuotes) {
+        const index = Math.floor(Math.random() * remainingQuotes.length);
+        const quote = remainingQuotes.splice(index, 1)[0];  // Убираем выбранную цитату из массива
         console.log('Выбрана цитата:', quote); // Логируем выбранную цитату
         return stripTags(quote.text);
     }
@@ -120,20 +120,6 @@
         console.log('Удаление завершено'); // Логируем окончание удаления
     }
 
-    // Функция для запуска цикла с цитатами
-    async function runQuoteLoop() {
-        console.log('Цикл цитат запущен'); // Логируем начало цикла
-        while (true) {
-            const quote = getRandomQuote();
-            await typeWriterEffect(quote, 100);
-            startBlink();
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            await deleteTextEffect(80);
-            startBlink();
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-    }
-
     // Функция для включения мигания курсора
     function startBlink() {
         cursor.classList.add('blink');
@@ -142,6 +128,38 @@
     // Функция для остановки мигания курсора
     function stopBlink() {
         cursor.classList.remove('blink');
+    }
+
+    // Функция для запуска цикла с цитатами
+    async function runQuoteLoop() {
+        console.log('Цикл цитат запущен');
+        let remainingQuotes = [...activeQuotes];  // Делаем копию массива цитат для текущего круга
+
+        while (remainingQuotes.length > 0) {
+            const quote = getRandomQuote(remainingQuotes);
+            console.log('Выбрана цитата:', quote);
+
+            // Печатаем цитату
+            await typeWriterEffect(quote, 100);
+
+            // Задержка для мигания курсора перед удалением
+            await new Promise(resolve => setTimeout(resolve, 500));
+            startBlink();
+
+            // Делаем паузу перед удалением
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
+            // Удаляем цитату
+            await deleteTextEffect(80);
+
+            // Задержка перед повторным началом цикла
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            startBlink();
+        }
+
+        console.log('Все цитаты показаны, начинаем новый круг');
+        remainingQuotes = [...activeQuotes];  // Обновляем массив для нового круга
+        runQuoteLoop();  // Запускаем цикл заново с перемешанными цитатами
     }
 
     // Если есть активные цитаты, запускаем цикл, иначе выводим сообщение
@@ -157,6 +175,7 @@
         console.error(`Произошла ошибка: ${msg} в ${url}:${lineNo}:${columnNo}`);
         return false; // Блокирует стандартное поведение ошибки
     };
+
 
 </script>
 </body>
