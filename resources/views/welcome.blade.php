@@ -160,6 +160,9 @@
         console.log('Все цитаты показаны, начинаем новый круг');
         remainingQuotes = [...activeQuotes];  // Обновляем массив для нового круга
         console.log('Перемешиваем цитаты для нового круга', remainingQuotes);
+
+        // Задержка перед запуском нового круга
+        await new Promise(resolve => setTimeout(resolve, 1000));
         runQuoteLoop();  // Запускаем цикл заново с перемешанными цитатами
     }
 
