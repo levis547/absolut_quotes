@@ -73,49 +73,56 @@
 
 <script>
     const quotes = @json($quotes->toArray());
+    console.log('Цитаты загружены:', quotes); // Логируем загруженные цитаты
+
     const container = document.getElementById('quote-container');
     const textElement = document.getElementById('quote-text');
     const cursor = document.querySelector('.cursor');
 
     const activeQuotes = quotes.filter(q => q.status === 1);
+    console.log('Активные цитаты:', activeQuotes); // Логируем активные цитаты
 
+    // Функция для удаления HTML-тегов из строки
     function stripTags(html) {
         const tmp = document.createElement("div");
         tmp.innerHTML = html;
         return tmp.textContent || tmp.innerText || "";
     }
 
+    // Функция для получения случайной цитаты
     function getRandomQuote() {
         const index = Math.floor(Math.random() * activeQuotes.length);
-        return stripTags(activeQuotes[index].text);
+        const quote = activeQuotes[index];
+        console.log('Выбрана цитата:', quote); // Логируем выбранную цитату
+        return stripTags(quote.text);
     }
 
-    function startBlink() {
-        cursor.classList.add('blink');
-    }
-
-    function stopBlink() {
-        cursor.classList.remove('blink');
-    }
-
+    // Функция для эффекта печати текста
     async function typeWriterEffect(text, speed = 3000) {
         stopBlink();
         textElement.innerHTML = '';
+        console.log('Начало печати текста'); // Логируем начало печати
         for (let i = 0; i < text.length; i++) {
             textElement.innerHTML += text[i];
             await new Promise(resolve => setTimeout(resolve, speed));
         }
+        console.log('Печать завершена'); // Логируем окончание печати
     }
 
+    // Функция для эффекта удаления текста
     async function deleteTextEffect(speed = 2000) {
         stopBlink();
+        console.log('Начало удаления текста'); // Логируем начало удаления
         while (textElement.innerHTML.length > 0) {
             textElement.innerHTML = textElement.innerHTML.slice(0, -1);
             await new Promise(resolve => setTimeout(resolve, speed));
         }
+        console.log('Удаление завершено'); // Логируем окончание удаления
     }
 
+    // Функция для запуска цикла с цитатами
     async function runQuoteLoop() {
+        console.log('Цикл цитат запущен'); // Логируем начало цикла
         while (true) {
             const quote = getRandomQuote();
             await typeWriterEffect(quote, 100);
@@ -127,11 +134,30 @@
         }
     }
 
+    // Функция для включения мигания курсора
+    function startBlink() {
+        cursor.classList.add('blink');
+    }
+
+    // Функция для остановки мигания курсора
+    function stopBlink() {
+        cursor.classList.remove('blink');
+    }
+
+    // Если есть активные цитаты, запускаем цикл, иначе выводим сообщение
     if (activeQuotes.length > 0) {
         runQuoteLoop();
     } else {
         textElement.innerText = 'Нет доступных цитат.';
+        console.log('Не найдено активных цитат'); // Логируем отсутствие активных цитат
     }
+
+    // Обработчик ошибок
+    window.onerror = function (msg, url, lineNo, columnNo, error) {
+        console.error(`Произошла ошибка: ${msg} в ${url}:${lineNo}:${columnNo}`);
+        return false; // Блокирует стандартное поведение ошибки
+    };
+
 </script>
 </body>
 </html>

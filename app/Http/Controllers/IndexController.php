@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Quote;
 use App\Models\User_visit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Jenssegers\Agent\Agent;
 use GuzzleHttp\Client;
 class IndexController extends Controller
@@ -14,8 +15,14 @@ class IndexController extends Controller
         // Отслеживаем посещение перед рендерингом страницы
         $this->trackVisit($request);
 
+        // Логируем начало обработки запроса
+        Log::info('Начало извлечения цитат');
+
         // Извлекаем все опубликованные цитаты
         $quotes = Quote::where('status', 1)->get();
+
+        // Логируем, сколько цитат было найдено
+        Log::info('Найдено цитат: ' . $quotes->count());
 
         return view('welcome', compact('quotes'));
     }
