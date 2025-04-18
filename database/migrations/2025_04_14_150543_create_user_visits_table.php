@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('ip_address');
             $table->string('browser');
             $table->string('address');
-            $table->string('count')->default(1);
+            $table->integer('count')->default(1);
             $table->timestamps();
         });
     }
