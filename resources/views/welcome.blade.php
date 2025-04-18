@@ -120,6 +120,9 @@
             transition: .3s;
         }
 
+        body.light-mode .cursor{
+            background: white;
+        }
     </style>
 </head>
 <body>
