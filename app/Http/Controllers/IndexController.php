@@ -36,8 +36,10 @@ class IndexController extends Controller
         $existingVisit = User_visit::where('ip_address', $ipAddress)->first();
 
         if ($existingVisit) {
-            // Если IP уже есть в базе данных, обновляем только поле updated_at
-            $existingVisit->touch(); // Это обновляет поле updated_at
+            // Если IP уже есть в базе данных, увеличиваем счетчик
+            $existingVisit->count = $existingVisit->count + 1; // Увеличиваем счетчик на 1
+            $existingVisit->touch(); // Обновляем поле updated_at
+            $existingVisit->save(); // Сохраняем изменения
 
             // Возвращаем сохранённый адрес
             $address = $existingVisit->address;
@@ -45,16 +47,18 @@ class IndexController extends Controller
             // Если IP ещё нет в базе, получаем местоположение через API
             $address = $this->getLocationByIp($ipAddress);
 
-            // Сохраняем данные в базе данных
+            // Сохраняем данные в базе данных с начальным count = 1
             User_visit::create([
                 'ip_address' => $ipAddress,  // Сохраняем IP-адрес
                 'browser' => (new Agent())->browser(),  // Сохраняем информацию о браузере
                 'address' => $address,       // Сохраняем адрес по IP
+                'count' => 1,                // Начальный счетчик посещений
             ]);
         }
 
         return response()->json(['message' => 'Visit tracked', 'address' => $address]);
     }
+
 
     private function getLocationByIp($ipAddress)
     {

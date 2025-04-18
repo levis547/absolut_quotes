@@ -10,5 +10,6 @@ class User_visit extends Model
         'ip_address',
         'browser',
         'address',
+        'count',
     ];
 }

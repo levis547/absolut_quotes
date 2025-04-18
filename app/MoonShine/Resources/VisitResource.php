@@ -48,6 +48,7 @@ class VisitResource extends ModelResource
                 Text::make('Айпи адресс', 'ip_address'),
                 Text::make('Броузер', 'browser'),
                 Text::make('Адресс', 'address'),
+                Text::make('Количество посещений', 'count'),
                 Text::make('Время обновления', 'updated_at'),
             ])
         ];
